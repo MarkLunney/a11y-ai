@@ -1,21 +1,18 @@
 import React from "react";
 import "./Cat.css";
 
-const Cat = ({ altTag }) => (
+const Cat = ({ width, altTag }) => (
   <div className="Cat">
     <img
-      src="https://placekitten.com/400/300"
+      src={`https://placekitten.com/${width}/300`}
       className="Cat-image"
       alt={altTag}
     />
     <p>
-      <pre>
-        <code>
-          &lt;img src="cat.png"
-          {altTag !== null && altTag !== undefined && <> alt="{altTag}"</>}{" "}
-          /&gt;
-        </code>
-      </pre>
+      <code>
+        &lt;img src="cat.png"
+        {typeof altTag === "string" && <> alt="{altTag}"</>} /&gt;
+      </code>
     </p>
   </div>
 );
