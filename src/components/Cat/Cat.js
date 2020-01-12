@@ -1,13 +1,12 @@
 import React from "react";
 import "./Cat.css";
 
-const Cat = ({ width, altTag }) => (
+/**
+ * 🐱
+ */
+const Cat = ({ src, altTag }) => (
   <div className="Cat">
-    <img
-      src={`https://placekitten.com/${width}/300`}
-      className="Cat-image"
-      alt={altTag}
-    />
+    <img src={src} className="Cat-image" alt={altTag} />
     <p>
       <code>
         &lt;img src="cat.png"
