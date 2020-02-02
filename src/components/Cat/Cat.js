@@ -4,9 +4,9 @@ import "./Cat.css";
 /**
  * 🐱
  */
-const Cat = ({ src, altTag }) => (
+const Cat = ({ src, altTag, onImageLoaded }) => (
   <div className="Cat">
-    <img src={src} className="Cat-image" alt={altTag} />
+    <img src={src} className="Cat-image" alt={altTag} onLoad={onImageLoaded} />
     <p>
       <code>
         &lt;img src="cat.png"
