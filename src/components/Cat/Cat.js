@@ -6,7 +6,13 @@ import "./Cat.css";
  */
 const Cat = ({ src, altTag, onImageLoaded }) => (
   <div className="Cat">
-    <img src={src} className="Cat-image" alt={altTag} onLoad={onImageLoaded} />
+    <img
+      src={src}
+      className="Cat-image"
+      alt={altTag}
+      onLoad={onImageLoaded}
+      crossOrigin="anonymous"
+    />
     <p>
       <code>
         &lt;img src="cat.png"
