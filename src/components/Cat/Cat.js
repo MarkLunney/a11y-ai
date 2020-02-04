@@ -4,15 +4,9 @@ import "./Cat.css";
 /**
  * 🐱
  */
-const Cat = ({ src, altTag, onImageLoaded }) => (
+const Cat = ({ src, altTag }) => (
   <div className="Cat">
-    <img
-      src={src}
-      className="Cat-image"
-      alt={altTag}
-      onLoad={onImageLoaded}
-      crossOrigin="anonymous"
-    />
+    <img src={src} className="Cat-image" alt={altTag} crossOrigin="anonymous" />
     <p>
       <code>
         &lt;img src="cat.png"

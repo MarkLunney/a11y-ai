@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import Cat from "../Cat";
 import Button from "@material-ui/core/Button";
 
@@ -12,48 +12,6 @@ import "./App.css";
 
 Amplify.configure(awsconfig);
 Amplify.addPluggable(new AmazonAIPredictionsProvider());
-
-/**
- * Generate a random int between 400 and 600
- */
-const randomWidth = () => Math.ceil(Math.random() * 200) + 400;
-
-/**
- * Generate an alt tag using Predictions API
- */
-const autoGenerateAltTag = (img, onComplete) => {
-  // Convert the cat as a base64 string
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-
-  canvas.height = img.naturalHeight;
-  canvas.width = img.naturalWidth;
-  ctx.drawImage(img, 0, 0);
-
-  const uri = canvas.toDataURL("image/jpeg");
-
-  // Convert image to buffer to send to API
-  const buffer = new Buffer(
-    uri.replace("data:image/jpeg;base64,", ""),
-    "base64"
-  );
-
-  // Identify labels using Predictions API
-  Predictions.identify({
-    labels: {
-      source: {
-        bytes: buffer
-      },
-      format: "LABELS" // Available options "PLAIN", "FORM", "TABLE", "ALL"
-    }
-  })
-    .then(({ labels }) => {
-      const matches = labels.map(label => label.name);
-
-      onComplete(matches.join(", "));
-    })
-    .catch(err => console.log(JSON.stringify(err, null, 2)));
-};
 
 /**
  * App Container
@@ -74,7 +32,7 @@ const App = () => {
     setLoading(true);
 
     // Determines the width of 🐱, ensuring it is different to the current cat
-    const newWidth = randomWidth();
+    const newWidth = Math.ceil(Math.random() * 200) + 400;
     setWidth(newWidth === width ? newWidth + 1 : newWidth);
   }, [width, setAltTag, setWidth]);
 
@@ -87,25 +45,42 @@ const App = () => {
   );
 
   /**
-   * Listen for the onLoad event on 🐱
+   * Auto-generate altTag based on image data whenever src changes
    */
-  const imageLoaded = useCallback(
-    event => {
-      // Set loading to false
-      setLoading(false);
+  useEffect(() => {
+    if (src) {
+      // Refetch src to get array buffer = browser cache will prevent multiple requests
+      fetch(src)
+        .then(res => res.arrayBuffer())
+        .then(buffer => {
+          // Identify labels using Predictions API
+          Predictions.identify({
+            labels: {
+              source: {
+                bytes: buffer // Set our buffer as the src. Also supports File and S3 Image Paths
+              },
+              format: "LABELS" // Available options "PLAIN", "FORM", "TABLE", "ALL"
+            }
+          })
+            .then(({ labels }) => {
+              const matches = labels.map(label => label.name);
 
-      // Generate alt tag
-      autoGenerateAltTag(event.target, setAltTag);
-    },
-    [setLoading, setAltTag]
-  );
+              // Set the alt tag to a list of the matches
+              setAltTag(matches.join(", "));
+
+              setLoading(false);
+            })
+            .catch(err => console.log(JSON.stringify(err, null, 2)));
+        });
+    }
+  }, [src, setAltTag, setLoading]);
 
   return (
     <main role="main" className="App">
       <h1>Random Cat Generator</h1>
 
-      {/* The Cat */}
-      {src && <Cat src={src} altTag={altTag} onImageLoaded={imageLoaded} />}
+      {/* 🐱 */}
+      {src && !isLoading && <Cat src={src} altTag={altTag} />}
 
       {/* Loading text */}
       {isLoading && <span>Waiting for the next cat...</span>}
