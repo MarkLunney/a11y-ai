@@ -100,7 +100,9 @@ const App = () => {
 
   return (
     <main role="main" className="App">
-      <h1>Random Cat Generator</h1>
+      <h1>
+        <img src="header.png" alt="Random Cat Generator" />
+      </h1>
 
       {/* Image of 🐱 */}
       {src && !isLoading && <Cat src={src} altTag={catAltTag} />}
