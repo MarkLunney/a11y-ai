@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import Cat from "../Cat";
-import Button from "@material-ui/core/Button";
 
 import Amplify from "aws-amplify";
+import { Button } from "aws-amplify-react";
 import awsconfig from "../../aws-exports";
 import Predictions, {
   AmazonAIPredictionsProvider
@@ -18,7 +18,7 @@ Amplify.addPluggable(new AmazonAIPredictionsProvider());
  */
 const App = () => {
   const [width, setWidth] = useState(null);
-  const [altTag, setAltTag] = useState(0);
+  const [altTag, setAltTag] = useState(undefined);
   const [isLoading, setLoading] = useState(false);
 
   /**
@@ -87,16 +87,7 @@ const App = () => {
 
       {/* Action Buttons */}
       {!isLoading && (
-        <Button
-          variant="contained"
-          onClick={generateCatWidth}
-          color="secondary"
-          style={{
-            marginBottom: "1rem"
-          }}
-        >
-          Fetch a new cat
-        </Button>
+        <Button onClick={generateCatWidth}>Fetch a new cat</Button>
       )}
     </main>
   );
