@@ -8,3 +8,14 @@
   color: white;
   text-align: center;
 }
+
+.fetchButton {
+  height: 50px;
+  cursor: pointer;
+  border: transparent 3px solid;
+}
+
+.fetchButton:hover,
+.fetchButton:focus {
+  border: white 3px solid;
+}

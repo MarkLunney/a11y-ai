@@ -2,7 +2,6 @@ import React, { useState, useMemo, useCallback, useEffect } from "react";
 import Cat from "../Cat";
 
 import Amplify from "aws-amplify";
-import { Button } from "aws-amplify-react";
 import awsconfig from "../../aws-exports";
 import Predictions, {
   AmazonAIPredictionsProvider
@@ -18,7 +17,8 @@ Amplify.addPluggable(new AmazonAIPredictionsProvider());
  */
 const App = () => {
   const [width, setWidth] = useState(null);
-  const [altTag, setAltTag] = useState(undefined);
+  const [catAltTag, setCatAltTag] = useState(undefined);
+  const [buttonAltTag, setButtonAltTag] = useState(undefined);
   const [isLoading, setLoading] = useState(false);
 
   /**
@@ -26,7 +26,7 @@ const App = () => {
    */
   const generateCatWidth = useCallback(() => {
     // Reset the alt tag
-    setAltTag(0);
+    setCatAltTag(0);
 
     // Set loading to true
     setLoading(true);
@@ -34,7 +34,23 @@ const App = () => {
     // Determines the width of 🐱, ensuring it is different to the current cat
     const newWidth = Math.ceil(Math.random() * 200) + 400;
     setWidth(newWidth === width ? newWidth + 1 : newWidth);
-  }, [width, setAltTag, setWidth]);
+  }, [width, setCatAltTag, setWidth]);
+
+  /**
+   * Support key down event on elements with button role
+   */
+  const onKeyDownCat = useCallback(
+    event => {
+      if (
+        event.key === " " ||
+        event.key === "Enter" ||
+        event.key === "Spacebar"
+      ) {
+        generateCatWidth();
+      }
+    },
+    [generateCatWidth]
+  );
 
   /**
    * Change the src of 🐱 whenever width changes
@@ -66,28 +82,43 @@ const App = () => {
               const matches = labels.map(label => label.name);
 
               // Set the alt tag to a list of the matches
-              setAltTag(matches.join(", "));
+              setCatAltTag(matches.join(", "));
 
               setLoading(false);
             })
             .catch(err => console.log(JSON.stringify(err, null, 2)));
         });
     }
-  }, [src, setAltTag, setLoading]);
+  }, [src, setCatAltTag, setLoading]);
+
+  /**
+   * Sets the alt tag of the button on mount
+   */
+  useEffect(() => {
+    setButtonAltTag("Fetch a new cat");
+  }, [setButtonAltTag]);
 
   return (
     <main role="main" className="App">
       <h1>Random Cat Generator</h1>
 
-      {/* 🐱 */}
-      {src && !isLoading && <Cat src={src} altTag={altTag} />}
+      {/* Image of 🐱 */}
+      {src && !isLoading && <Cat src={src} altTag={catAltTag} />}
 
       {/* Loading text */}
       {isLoading && <span>Waiting for the next cat...</span>}
 
-      {/* Action Buttons */}
+      {/* Button to fetch a new 🐱 */}
       {!isLoading && (
-        <Button onClick={generateCatWidth}>Fetch a new cat</Button>
+        <img
+          src="fetch-text.png"
+          alt={buttonAltTag}
+          className="fetchButton"
+          tabIndex="0"
+          onClick={generateCatWidth}
+          onKeyDown={onKeyDownCat}
+          role="button"
+        />
       )}
     </main>
   );
