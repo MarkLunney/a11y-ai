@@ -13,18 +13,5 @@
 			"customAuth": false
 		}
 	},
-	"predictions": {
-		"identifyLabelsafcf140b": {
-			"providerPlugin": "awscloudformation",
-			"service": "Rekognition",
-			"dependsOn": [],
-			"identifyType": "identifyLabels"
-		},
-		"identifyText17b33699": {
-			"providerPlugin": "awscloudformation",
-			"service": "Rekognition",
-			"dependsOn": [],
-			"identifyType": "identifyText"
-		}
-	}
+	"predictions": {}
 }

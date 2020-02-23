@@ -1,16 +1,10 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import Cat from "../Cat";
 
-import Amplify from "aws-amplify";
-import awsconfig from "../../aws-exports";
-import Predictions, {
-  AmazonAIPredictionsProvider
-} from "@aws-amplify/predictions";
-
+import responseToTag from "../../utils/responseToTag";
+import endpoints from "../../constants/endpoints";
+import headers from "../../constants/headers";
 import "./App.css";
-
-Amplify.configure(awsconfig);
-Amplify.addPluggable(new AmazonAIPredictionsProvider());
 
 /**
  * App Container
@@ -65,28 +59,23 @@ const App = () => {
    */
   useEffect(() => {
     if (src) {
-      // Refetch src to get array buffer = browser cache will prevent multiple requests
-      fetch(src)
-        .then(res => res.arrayBuffer())
-        .then(buffer => {
-          // Identify labels using Predictions API
-          Predictions.identify({
-            labels: {
-              source: {
-                bytes: buffer // Set our buffer as the src. Also supports File and S3 Image Paths
-              },
-              format: "LABELS" // Available options "PLAIN", "FORM", "TABLE", "ALL"
-            }
-          })
-            .then(({ labels }) => {
-              const matches = labels.map(label => label.name);
+      fetch(endpoints.analyze, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ url: src })
+      })
+        .then(response => response.json())
+        .then(json => {
+          console.log("Received: ", json);
 
-              // Set the alt tag to a list of the matches
-              setCatAltTag(matches.join(", "));
+          setCatAltTag(responseToTag(json.description, json.objects));
+          // setCatAltTag(responseToTag(null, json.objects));
 
-              setLoading(false);
-            })
-            .catch(err => console.log(JSON.stringify(err, null, 2)));
+          setLoading(false);
+        })
+        .catch(err => {
+          setLoading(false);
+          console.error(JSON.stringify(err, null, 2));
         });
     }
   }, [src, setCatAltTag, setLoading]);
