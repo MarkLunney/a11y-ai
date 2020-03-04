@@ -21,3 +21,7 @@
 .fetchButton:focus {
   border: white 3px solid;
 }
+
+img {
+  max-width: calc(100vw - 1rem);
+}
